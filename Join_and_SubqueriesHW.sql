@@ -15,7 +15,7 @@ where amount > 6.99;
 -- Answer: see table below
 
 -- Question 3:
-select first_name, last_name from customer
+select customer_id, first_name, last_name from customer
 where customer.customer_id in (
 	select customer_id from payment
 	group by customer_id
@@ -27,32 +27,38 @@ where customer.customer_id in (
 select * from customer;
 select * from address;
 select * from city;
-select first_name, last_name, address.address, city.city from customer
+select * from country;
+select first_name, last_name, address.address, country from customer
 join address
 on customer.address_id = address.address_id
 join city
 on address.city_id = city.city_id
-where city.city = 'Nepal'
--- Answer: None, look at query below to see city that start with Ne
-select city from city
-where city like 'Ne%'
+join country
+on city.country_id = country.country_id
+where country.country = 'Nepal';
+-- Answer: Kevin Schuler
 
 -- Question 5:
-select staff_id, count(staff_id) as c from payment
-group by staff_id
+select * from staff;
+select staff.staff_id, first_name, last_name, count(payment.staff_id) as c from payment
+join staff
+on payment.staff_id = staff.staff_id
+group by staff.staff_id, first_name, last_name
 order by c desc
 limit 1;
--- Answer: staff 2 with 7,304 transactions
+-- Answer: Jon Stephens (staff 2 with 7,304 transactions)
 
 -- Question 6:
 select * from film;
 select * from film_actor;
 
-select film_id, count(actor_id) as c from film_actor
-group by film_id
+select film_actor.film_id, title, count(film_actor.actor_id) as c from film_actor
+join film
+on film_actor.film_id = film.film_id
+group by film_actor.film_id, title
 order by c desc
 limit 1;
--- Answer: film 508 with 15 actors
+-- Answer: Lambs Cincinatti with 15 actors
 
 
 -- Question 7:
@@ -65,9 +71,10 @@ limit 1;
 -- Answer: Emily Dee with 14 films
 
 -- Question 8:
-select district, count(customer.address_id) from address
-join customer 
-on address.address_id = customer.address_id
+select * from address;
+select district, count(customer.address_id) from customer
+join address
+on customer.address_id = address.address_id 
 group by district
 having count(customer.address_id) > 5
 -- Answer: See table below
